@@ -16,6 +16,9 @@ class room1 extends Phaser.Scene {
 
         this.load.image("classroompng","assets/classroom32x32.png");
         this.load.image("shelvespng","assets/shelves32x32.png");
+        this.load.image("flying_books","assets/flying_books_1.png");
+        this.load.audio("pling", "assets/pling.mp3");
+
 
         // characters
         this.load.atlas('emmy', 'assets/player.png', 'assets/player.json');
@@ -27,6 +30,9 @@ class room1 extends Phaser.Scene {
 
            let map = this.make.tilemap({key: "room1"});
 
+           //sound
+           this.pling = this.sound.add('pling');
+
            let tileset1= map.addTilesetImage("classroom32x32", "classroompng");
            let tileset2= map.addTilesetImage("shelves32x32", "shelvespng");
 
@@ -36,98 +42,40 @@ class room1 extends Phaser.Scene {
            this.tableLayer = map.createLayer("tableLayer", tilesArray, 0, 0);
            this.chairLayer = map.createLayer("chairLayer", tilesArray, 0, 0);
            this.cabinetLayer = map.createLayer("cabinetLayer", tilesArray, 0, 0);
-           this.chairLayer = map.createLayer("bookLayer", tilesArray, 0, 0);
 
            // Enable debugging
            window.player = this.player;
 
-           this.anims.create({
-            key:"left",
-            frames:[
-                {key:"emmy",frame:"left1"},
-                {key:"emmy",frame:"left2"},
-                {key:"emmy",frame:"left3"},
-                {key:"emmy",frame:"left4"},
-                {key:"emmy",frame:"left5"},
-                {key:"emmy",frame:"left6"},
-                {key:"emmy",frame:"left7"},
-                {key:"emmy",frame:"left8"},
-                {key:"emmy",frame:"left9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"right",
-            frames:[
-                {key:"emmy",frame:"right1"},
-                {key:"emmy",frame:"right2"},
-                {key:"emmy",frame:"right3"},
-                {key:"emmy",frame:"right4"},
-                {key:"emmy",frame:"right5"},
-                {key:"emmy",frame:"right6"},
-                {key:"emmy",frame:"right7"},
-                {key:"emmy",frame:"right8"},
-                {key:"emmy",frame:"right9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"up",
-            frames:[
-                {key:"emmy",frame:"back1"},
-                {key:"emmy",frame:"back2"},
-                {key:"emmy",frame:"back3"},
-                {key:"emmy",frame:"back4"},
-                {key:"emmy",frame:"back5"},
-                {key:"emmy",frame:"back6"},
-                {key:"emmy",frame:"back7"},
-                {key:"emmy",frame:"back8"},
-                {key:"emmy",frame:"back9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"down",
-            frames:[
-                {key:"emmy",frame:"front1"},
-                {key:"emmy",frame:"front2"},
-                {key:"emmy",frame:"front3"},
-                {key:"emmy",frame:"front4"},
-                {key:"emmy",frame:"front5"},
-                {key:"emmy",frame:"front6"},
-                {key:"emmy",frame:"front7"},
-                {key:"emmy",frame:"front8"},
-                {key:"emmy",frame:"front9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-
-        this.physics.world.bounds.width = this.groundLayer.width*2;
-        this.physics.world.bounds.height = this.groundLayer.height*2;
+        // this.physics.world.bounds.width = this.groundLayer.width;
+        // this.physics.world.bounds.height = this.groundLayer.height;
         
         // load player into phytsics
-        this.player = this.physics.add.sprite(30, 260, "emmy").setScale(2)
+        this.player = this.physics.add.sprite(333, 550, "emmy");
         
         //enable
         window.player = this.player;
 
-        // this.player.setCollideWorldBounds(true); //don't go out of this map
-        
-        // this.cabinetLayer.setCollisionByExclusion (-1,true);
-        // this.chairLayer.setCollisionByExclusion (-1,true);
-        // this.tableLayer.setCollisionByExclusion (-1,true);
+        //flying_books
+        this.flying_books_1 = this.physics.add.sprite(430, 574, "flying_books");
+        this.flying_books_2 = this.physics.add.sprite(530, 366, "flying_books");
+        this.flying_books_3 = this.physics.add.sprite(136, 296, "flying_books");
 
-        // // this.physics.add.collider(this.player,this.cabinetLayer);
-        // this.physics.add.collider(this.player,this.chairLayer);
-        // this.physics.add.collider(this.player,this.tableLayer);
+        this.player.setCollideWorldBounds(true); //don't go out of this map
+        
+        this.cabinetLayer.setCollisionByExclusion (-1,true);
+        this.chairLayer.setCollisionByExclusion (-1,true);
+        this.tableLayer.setCollisionByExclusion (-1,true);
+        // this.bookLayer.setCollisionByExclusion (-1,true);
+
         // this.physics.add.collider(this.player,this.cabinetLayer);
+        this.physics.add.collider(this.player,this.chairLayer);
+        this.physics.add.collider(this.player,this.tableLayer);
+        this.physics.add.collider(this.player,this.cabinetLayer);
+        // this.physics.add.collider(this.player,this.bookLayer);
+
+        this.physics.add.overlap( this.player, this.flying_books_1, this.collectFlying_books, null, this)
+        this.physics.add.overlap( this.player, this.flying_books_2, this.collectFlying_books, null, this)
+        this.physics.add.overlap( this.player, this.flying_books_3, this.collectFlying_books, null, this)
 
         //  Input Events
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -135,14 +83,15 @@ class room1 extends Phaser.Scene {
         // make the camera follow the player
         this.cameras.main.startFollow(this.player);
 
+
     } // end of create //  
 
         update() {
             
             if(
-                this.player.x > 293 &&
-                this.player.x < 419 &&
-                this.player.y > 603
+                this.player.x > 295 &&
+                this.player.x < 362 &&
+                this.player.y > 621 
             ){
                 this.world();
             }
@@ -170,12 +119,35 @@ class room1 extends Phaser.Scene {
             this.player.setVelocity(0);
         }
 
-    }
+    } // end of update // 
 
     //function to jump to world
     world(player,tile) {
         console.log("world function");
-        this.scene.start('world')
+        let playerPos = {};
+        playerPos.x = 346;
+        playerPos.y = 480;
+        playerPos.dir = "emmy";
+
+        this.scene.start("world",{playerPos: playerPos});
     }
+
+    collectFlying_books(player, flying_books) {
+        console.log("collect Flying_books");
+        flying_books.disableBody(true,true);
+
+        this.pling.play();
+
+        // flying_books(true,true);
+
+        window.flying_books = window.flying_books +1;
+        console.log("flying_books: ",window.flying_books);
+
+        // this.Score.setText("flying_books:"+ window.flying_books);
+
+        // score += 10;
+        // scoreText.setText
+
+    } // end of collectFlying_books//
 
 }

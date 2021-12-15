@@ -8,13 +8,14 @@ class main extends Phaser.Scene {
   }
 
   preload() {
-
-    
+    this.load.image("IntroScene", "assets/IntroScene.jpg");
 
   }
 
   create() {
-    console.log("*** main scene");
+    console.log("IntroScene");
+
+    this.add.image(0, 0, 'IntroScene').setOrigin(0, 0);
 
     // Add any sound and music here
     // ( 0 = mute to 1 is loudest )
@@ -29,24 +30,25 @@ class main extends Phaser.Scene {
     // Check for spacebar or any key here
     var spaceDown = this.input.keyboard.addKey("SPACE");
 
-    // On spacebar event, call the world scene
+    // On spacebar event, call the world scene          //\\only last scene jump to the world.js
     spaceDown.on(
       "down",
       function () {
-        console.log("Jump to world scene");
+        console.log("Jump to introduction scene");
 
-        this.scene.start(
-          "world",
-          // Optional parameters
-          {}
-        );
+        let playerPos = {};
+        playerPos.x = 626;
+        playerPos.y = 493;
+        playerPos.dir = "emmy" ;
+
+        this.scene.start("introduction",{playerPos: playerPos})  
       },
       this
     );
 
-    // Add any text in the main page
-    this.add.text(90, 600, "Press spacebar to continue", {
-      font: "30px Courier",
+    // Add any text in the IntroScene
+    this.add.text(170, 600, "Press spacebar to continue", {
+      font: "30px Gaegu",
       fill: "#FFFFFF",
     });
 

@@ -16,6 +16,8 @@ class room2 extends Phaser.Scene {
 
         this.load.image("classroompng","assets/classroom32x32.png");
         this.load.image("streetpng","assets/street32x32.png");
+        this.load.image("chemistry_1","assets/chemistry_1.png");
+        this.load.audio("ping", "assets/pling.mp3");
 
         // characters
         this.load.atlas('emmy', 'assets/player.png', 'assets/player.json');
@@ -26,6 +28,9 @@ class room2 extends Phaser.Scene {
         console.log('*** room2 scene');
 
            let map = this.make.tilemap({key: "room2"});
+
+           //sound
+           this.pling = this.sound.add('pling');
 
            let tileset1= map.addTilesetImage("classroom32x32", "classroompng");
            let tileset2= map.addTilesetImage("street32x32", "streetpng");
@@ -41,93 +46,35 @@ class room2 extends Phaser.Scene {
            // Enable debugging
            window.player = this.player;
 
-           this.anims.create({
-            key:"left",
-            frames:[
-                {key:"emmy",frame:"left1"},
-                {key:"emmy",frame:"left2"},
-                {key:"emmy",frame:"left3"},
-                {key:"emmy",frame:"left4"},
-                {key:"emmy",frame:"left5"},
-                {key:"emmy",frame:"left6"},
-                {key:"emmy",frame:"left7"},
-                {key:"emmy",frame:"left8"},
-                {key:"emmy",frame:"left9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"right",
-            frames:[
-                {key:"emmy",frame:"right1"},
-                {key:"emmy",frame:"right2"},
-                {key:"emmy",frame:"right3"},
-                {key:"emmy",frame:"right4"},
-                {key:"emmy",frame:"right5"},
-                {key:"emmy",frame:"right6"},
-                {key:"emmy",frame:"right7"},
-                {key:"emmy",frame:"right8"},
-                {key:"emmy",frame:"right9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"up",
-            frames:[
-                {key:"emmy",frame:"back1"},
-                {key:"emmy",frame:"back2"},
-                {key:"emmy",frame:"back3"},
-                {key:"emmy",frame:"back4"},
-                {key:"emmy",frame:"back5"},
-                {key:"emmy",frame:"back6"},
-                {key:"emmy",frame:"back7"},
-                {key:"emmy",frame:"back8"},
-                {key:"emmy",frame:"back9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"down",
-            frames:[
-                {key:"emmy",frame:"front1"},
-                {key:"emmy",frame:"front2"},
-                {key:"emmy",frame:"front3"},
-                {key:"emmy",frame:"front4"},
-                {key:"emmy",frame:"front5"},
-                {key:"emmy",frame:"front6"},
-                {key:"emmy",frame:"front7"},
-                {key:"emmy",frame:"front8"},
-                {key:"emmy",frame:"front9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-
-        // this.physics.world.bounds.width = this.groundLayer.width*2;
-        // this.physics.world.bounds.height = this.groundLayer.height*2;
+        // this.physics.world.bounds.width = this.groundLayer.width;
+        // this.physics.world.bounds.height = this.groundLayer.height;
         
         // load player into phytsics
-        this.player = this.physics.add.sprite(30, 260, "emmy").setScale(2)
+        this.player = this.physics.add.sprite(333, 550, "emmy")
         
         //enable
         window.player = this.player;
 
-        // this.player.setCollideWorldBounds(true); //don't go out of this map
+        //potion 
+        this.chemistry_1 = this.physics.add.sprite(170, 523, "chemistry_1");
+        this.chemistry_2 = this.physics.add.sprite(144, 398, "chemistry_1");
+        this.chemistry_3 = this.physics.add.sprite(623, 300, "chemistry_1");
         
-        // this.wallLayer.setCollisionByExclusion (-1,true);
-        // this.boardLayer.setCollisionByExclusion (-1,true);
-        // this.tableLayer.setCollisionByExclusion (-1,true);
 
-        // this.physics.add.collider(this.player,this.cabinetLayer);
-        // this.physics.add.collider(this.player,this.wallLayer);
-        // this.physics.add.collider(this.player,this.boardLayer);
+        this.player.setCollideWorldBounds(true); //don't go out of this map
+        
+        this.wallLayer.setCollisionByExclusion (-1,true);
+        this.boardLayer.setCollisionByExclusion (-1,true);
+        this.tableLayer.setCollisionByExclusion (-1,true);
+        // this.thingsLayer.setCollisionByExclusion (-1,true);
+
+        this.physics.add.collider(this.player,this.wallLayer);
+        this.physics.add.collider(this.player,this.boardLayer);
         // this.physics.add.collider(this.player,this.tableLayer);
+
+        this.physics.add.overlap( this.player, this.chemistry_1, this.collectPotion, null, this)
+        this.physics.add.overlap( this.player, this.chemistry_2, this.collectPotion, null, this)
+        this.physics.add.overlap( this.player, this.chemistry_3, this.collectPotion, null, this)
 
         //  Input Events
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -140,9 +87,10 @@ class room2 extends Phaser.Scene {
         update() {
             
             if(
-                this.player.x > 293 &&
-                this.player.x < 419 &&
-                this.player.y > 603
+                this.player.x > 310 &&
+                this.player.x < 340 &&
+                this.player.y > 600 &&
+                this.player.y < 621
             ){
                 this.world();
             }
@@ -170,12 +118,37 @@ class room2 extends Phaser.Scene {
             this.player.setVelocity(0);
         }
 
-    }
+    } // end of update //  
 
     //function to jump to world
     world(player,tile) {
         console.log("world function");
-        this.scene.start('world')
+        let playerPos = {};
+        playerPos.x = 329;
+        playerPos.y = 177;
+        playerPos.dir = "emmy" ;
+
+        this.scene.start("world",{playerPos: playerPos});
     }
+
+    collectPotion(player, potion) {
+        console.log("collect Potion");
+        potion.disableBody(true,true);
+
+        this.pling.play();
+
+        // potion(true,true);
+
+        window.potion = window.potion +1;
+        console.log("potion: ",window.potion);
+
+        // this.Score.setText("potion:"+ window.potion);
+
+
+        // score += 10;
+        // scoreText.setText
+
+    } // end of collectPotion //
+    
 
 }

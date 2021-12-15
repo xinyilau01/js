@@ -1,7 +1,7 @@
-class room1 extends Phaser.Scene {
+class room3 extends Phaser.Scene {
 
     constructor() {
-        super('room1');
+        super('room3');
         
         // Put global variable here
     }
@@ -12,122 +12,76 @@ class room1 extends Phaser.Scene {
     }
 
     preload() {
-        var map = this.load.tilemapTiledJSON("room1",'assets/room1.json');
+        var map = this.load.tilemapTiledJSON("room3",'assets/room3.json');
 
-        this.load.image("classroompng","assets/classroom32x32.png");
-        this.load.image("shelvespng","assets/shelves32x32.png");
+        this.load.image("streetpng","assets/Street32x32.png");
+        this.load.image("walljpg","assets/wall32x32.jpg");
+        this.load.image("bedroompng","assets/bedroom32x32.png");
+        this.load.image("piano_sheets","assets/piano_sheets_1.png");
+        this.load.audio("pling", "assets/pling.mp3");
+
 
         // characters
         this.load.atlas('emmy', 'assets/player.png', 'assets/player.json');
 
+        this.load.atlas('pammy', 'assets/npc.png', 'assets/npc.json');
+
     }
 
     create() {
-        console.log('*** room1 scene');
+        console.log("*** room3 scene");
 
-           let map = this.make.tilemap({key: "room1"});
+           let map = this.make.tilemap({
+               key: "room3"
+            });
 
-           let tileset1= map.addTilesetImage("classroom32x32", "classroompng");
-           let tileset2= map.addTilesetImage("shelves32x32", "shelvespng");
+            //sound
+           this.pling = this.sound.add('pling');
 
-           let tilesArray = [tileset1];
+
+           let tileset1= map.addTilesetImage("bedroom32x32", "bedroompng");
+           let tileset2= map.addTilesetImage("Street32x32", "streetpng");
+           let tileset3= map.addTilesetImage("wall32x32", "walljpg");
+
+           let tilesArray = [tileset1, tileset2, tileset3];
 
            this.groundLayer = map.createLayer("groundLayer", tilesArray, 0, 0);
-           this.tableLayer = map.createLayer("tableLayer", tilesArray, 0, 0);
-           this.chairLayer = map.createLayer("chairLayer", tilesArray, 0, 0);
-           this.cabinetLayer = map.createLayer("cabinetLayer", tilesArray, 0, 0);
-           this.chairLayer = map.createLayer("bookLayer", tilesArray, 0, 0);
+           this.wallLayer = map.createLayer("wallLayer", tilesArray, 0, 0);
+           this.furnitureLayer = map.createLayer("furnitureLayer", tilesArray, 0, 0);
+           this.thingsLayer = map.createLayer("thingsLayer", tilesArray, 0, 0);
 
-           // Enable debugging
-           window.player = this.player;
+            // Enable debugging
+            window.player = this.player;
 
-           this.anims.create({
-            key:"left",
-            frames:[
-                {key:"emmy",frame:"left1"},
-                {key:"emmy",frame:"left2"},
-                {key:"emmy",frame:"left3"},
-                {key:"emmy",frame:"left4"},
-                {key:"emmy",frame:"left5"},
-                {key:"emmy",frame:"left6"},
-                {key:"emmy",frame:"left7"},
-                {key:"emmy",frame:"left8"},
-                {key:"emmy",frame:"left9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"right",
-            frames:[
-                {key:"emmy",frame:"right1"},
-                {key:"emmy",frame:"right2"},
-                {key:"emmy",frame:"right3"},
-                {key:"emmy",frame:"right4"},
-                {key:"emmy",frame:"right5"},
-                {key:"emmy",frame:"right6"},
-                {key:"emmy",frame:"right7"},
-                {key:"emmy",frame:"right8"},
-                {key:"emmy",frame:"right9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"up",
-            frames:[
-                {key:"emmy",frame:"back1"},
-                {key:"emmy",frame:"back2"},
-                {key:"emmy",frame:"back3"},
-                {key:"emmy",frame:"back4"},
-                {key:"emmy",frame:"back5"},
-                {key:"emmy",frame:"back6"},
-                {key:"emmy",frame:"back7"},
-                {key:"emmy",frame:"back8"},
-                {key:"emmy",frame:"back9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
-    
-        this.anims.create({
-            key:"down",
-            frames:[
-                {key:"emmy",frame:"front1"},
-                {key:"emmy",frame:"front2"},
-                {key:"emmy",frame:"front3"},
-                {key:"emmy",frame:"front4"},
-                {key:"emmy",frame:"front5"},
-                {key:"emmy",frame:"front6"},
-                {key:"emmy",frame:"front7"},
-                {key:"emmy",frame:"front8"},
-                {key:"emmy",frame:"front9"},
-            ],
-            frameRate:10,
-            repeat:-1
-        });
 
-        this.physics.world.bounds.width = this.groundLayer.width*2;
-        this.physics.world.bounds.height = this.groundLayer.height*2;
+        // this.physics.world.bounds.width = this.groundLayer.width;
+        // this.physics.world.bounds.height = this.groundLayer.height;
         
         // load player into phytsics
-        this.player = this.physics.add.sprite(30, 260, "emmy").setScale(2)
+        this.player = this.physics.add.sprite(333, 550, "emmy")
+
+         //enable
+         window.player = this.player;
+
+         //piano sheets
+        this.piano_sheets_1 = this.physics.add.sprite(307, 488, "piano_sheets");
+        this.piano_sheets_2 = this.physics.add.sprite(547, 560, "piano_sheets");
+        this.piano_sheets_3 = this.physics.add.sprite(287, 272, "piano_sheets");
         
-        //enable
-        window.player = this.player;
 
         this.player.setCollideWorldBounds(true); //don't go out of this map
         
-        this.cabinetLayer.setCollisionByExclusion (-1,true);
-        this.chairLayer.setCollisionByExclusion (-1,true);
-        this.tableLayer.setCollisionByExclusion (-1,true);
+        this.wallLayer.setCollisionByExclusion (-1,true);
+        this.furnitureLayer.setCollisionByExclusion (-1,true);
+        this.thingsLayer.setCollisionByExclusion (-1,true);
 
-        // this.physics.add.collider(this.player,this.cabinetLayer);
-        this.physics.add.collider(this.player,this.chairLayer);
-        this.physics.add.collider(this.player,this.tableLayer);
-        this.physics.add.collider(this.player,this.cabinetLayer);
+        this.physics.add.collider(this.player,this.wallLayer);
+        this.physics.add.collider(this.player,this.furnitureLayer);
+        this.physics.add.collider(this.player,this.thingsLayer);
+
+        this.physics.add.overlap( this.player, this.piano_sheets_1, this.collectSheets, null, this)
+        this.physics.add.overlap( this.player, this.piano_sheets_2, this.collectSheets, null, this)
+        this.physics.add.overlap( this.player, this.piano_sheets_3, this.collectSheets, null, this)
 
         //  Input Events
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -140,9 +94,9 @@ class room1 extends Phaser.Scene {
         update() {
             
             if(
-                this.player.x > 293 &&
-                this.player.x < 419 &&
-                this.player.y > 603
+                this.player.x > 310 &&
+                this.player.x < 368 &&
+                this.player.y > 621
             ){
                 this.world();
             }
@@ -170,12 +124,38 @@ class room1 extends Phaser.Scene {
             this.player.setVelocity(0);
         }
 
-    }
+    } // end of update //  
 
     //function to jump to world
     world(player,tile) {
         console.log("world function");
-        this.scene.start('world')
+        let playerPos = {};
+        playerPos.x = 772;
+        playerPos.y = 551;
+        playerPos.dir = "emmy" ;
+
+        this.scene.start("world",{playerPos: playerPos});
     }
+
+    collectSheets(player, sheets) {
+        console.log("collect Sheets");
+        sheets.disableBody(true,true);
+
+        this.pling.play();
+
+        // sheets(true,true);
+
+        window.sheets = window.sheets +1;
+        console.log("sheets: ",window.sheets);
+
+        // this.Score.setText("sheets:"+ window.sheets);
+        
+
+        // score += 10;
+        // scoreText.setText
+
+    } // end of collectSheets //
+
+
 
 }

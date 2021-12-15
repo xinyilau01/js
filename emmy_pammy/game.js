@@ -9,13 +9,13 @@
             debug: true
         }
     },
-    // scale: {
-    //     mode: Phaser.Scale.FIT,
-    //     autoCenter: Phaser.Scale.CENTER_BOTH
-    // },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     backgroundColor: '#000000',
     pixelArt: true,
-    scene: [main, world, room1,room2],
+    scene: [main, introduction, mechanism, instruction, world, room1, room2, room3, room_1, room_2, room_3, LoseScene],
 };
 
 var game = new Phaser.Game(config);

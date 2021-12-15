@@ -4,6 +4,10 @@ class world extends Phaser.Scene {
     super({ key: "world" });
   }
 
+  init(data) {
+    this.playerPos = data.playerPos;
+  }
+
   preload() {
 
     var map = this.load.tilemapTiledJSON('map1','assets/map1.json');
@@ -13,6 +17,7 @@ class world extends Phaser.Scene {
     this.load.image("tileset1png", "assets/tileset1.png");
     this.load.image("tileset2png", "assets/tileset2.png");
     this.load.image("housepng", "assets/house32x32.png");
+
 
     // characters
     this.load.atlas('emmy', 'assets/player.png', 'assets/player.json');
@@ -26,21 +31,29 @@ class world extends Phaser.Scene {
 
     let map = this.make.tilemap({key: "map1"});
 
-    var tileset1= map.addTilesetImage("land32x32", "landpng");
-    var tileset2= map.addTilesetImage("tileset1", "tileset1png");
-    var tileset3= map.addTilesetImage("tileset2", "tileset2png");
-    var tileset4= map.addTilesetImage("house32x32", "housepng");
+ 
+
+    let tileset1 = map.addTilesetImage("land32x32", "landpng");
+    let tileset2 = map.addTilesetImage("tileset1", "tileset1png");
+    let tileset3 = map.addTilesetImage("tileset2", "tileset2png");
+    let tileset4 = map.addTilesetImage("house32x32", "housepng");
 
     let tilesArray = [tileset1, tileset2, tileset3, tileset4];
 
-    this.groundLayer = map.createLayer("groundLayer", tilesArray, 0, 0).setScale(2);
-    this.treeLayer = map.createLayer("treeLayer", tilesArray, 0, 0).setScale(2);
-    this.thingsLayer = map.createLayer("thingsLayer", tilesArray, 0, 0).setScale(2);
-    this.buildingLayer = map.createLayer("buildingLayer", tilesArray, 0, 0).setScale(2);
-    this.hallLayer = map.createLayer("hallLayer", tilesArray, 0, 0).setScale(2);
+    this.groundLayer = map.createLayer("groundLayer", tilesArray, 0, 0);
+    this.treeLayer = map.createLayer("treeLayer", tilesArray, 0, 0);
+    this.thingsLayer = map.createLayer("thingsLayer", tilesArray, 0, 0);
+    this.buildingLayer = map.createLayer("buildingLayer", tilesArray, 0, 0);
+    this.hallLayer = map.createLayer("hallLayer", tilesArray, 0, 0);
 
-    this.physics.world.bounds.width = this.groundLayer.width*2;
-    this.physics.world.bounds.height = this.groundLayer.height*2;
+    this.physics.world.bounds.width = this.groundLayer.width;
+    this.physics.world.bounds.height = this.groundLayer.height;
+
+    this.player = this.physics.add.sprite(
+        this.playerPos.x,
+        this.playerPos.y,
+        this.playerPos.dir
+      );
 
     this.anims.create({
         key:"left",
@@ -110,19 +123,23 @@ class world extends Phaser.Scene {
         repeat:-1
     });
 
-this.physics.world.bounds.width = this.groundLayer.width*2;
-this.physics.world.bounds.height = this.groundLayer.height*2;
+
+
+this.physics.world.bounds.width = this.groundLayer.width;
+this.physics.world.bounds.height = this.groundLayer.height;
 
 // load player into phytsics
-this.player = this.physics.add.sprite(30, 260, 'emmy').setScale(2)
 
-// this.thingsLayer.setCollisionByExclusion (-1,true);
-// this.buildingLayer.setCollisionByExclusion (-1,true);
-// this.treeLayer.setCollisionByExclusion (-1,true);
+//enable
+window.player = this.player;
 
-// this.physics.add.collider(this.player,this.thingsLayer);
-// this.physics.add.collider(this.player,this.buildingLayer);
-// this.physics.add.collider(this.player,this.treeLayer);
+this.thingsLayer.setCollisionByExclusion (-1,true);
+this.treeLayer.setCollisionByExclusion (-1,true);
+this.buildingLayer.setCollisionByExclusion (-1,true);
+
+this.physics.add.collider(this.player,this.thingsLayer);
+this.physics.add.collider(this.player,this.treeLayer);
+this.physics.add.collider(this.player,this.buildingLayer);
 
 //  Input Events
 this.cursors = this.input.keyboard.createCursorKeys();
@@ -135,24 +152,34 @@ this.cameras.main.startFollow(this.player);
 
 update () {    
 
-    if(
-        this.player.x > 540 &&
-        this.player.x < 630 &&
-        this.player.y > 319 &&
-        this.player.y < 340
+    if (
+        this.player.x > 319 &&
+        this.player.x < 369 &&
+        this.player.y > 450 &&
+        this.player.y < 466
     ){
         this.room1();
-    } else if (
-        this.player.x > 540 &&
-        this.player.x < 630 &&
-        this.player.y > 319 &&
-        this.player.y < 340
+    }
+    
+    if(
+        this.player.x > 320 &&
+        this.player.x < 360 &&
+        this.player.y > 149 &&
+        this.player.y < 173 
     ){
         this.room2();
-    }
+    } 
 
+    if(
+        this.player.x > 722 &&
+        this.player.x < 816 &&
+        this.player.y > 400 &&
+        this.player.y < 550 
+    ){
+        this.room3();
+    } 
 
-
+    
 if (this.cursors.left.isDown) 
 {
     this.player.setVelocityX(-200);
@@ -190,16 +217,9 @@ room2(player, title){
     this.scene.start("room2");
 }
 
-// room3(player, title){
-//     console.log("room3 function");
-//     this.scene.start("room3");
-// }
-
-// room4(player, title){
-//     console.log("room4 function");
-//     this.scene.start("room4");
-// }
-
-
+room3(player, title){
+    console.log("room3 function");
+    this.scene.start("room3");
+}
 
 }
